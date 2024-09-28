@@ -58,7 +58,11 @@ export default function SizesList() {
         <div key={size}>
           <List
             size={size}
-            sx={{ maxWidth: 300, borderRadius: "sm", height: "100vh" }}
+            sx={{
+              maxWidth: 300,
+              borderRadius: "sm",
+              height: "100vh",
+            }}
           >
             <ListItem>
               <ListItemButton sx={{ color: "#a5a4bf" }}>
