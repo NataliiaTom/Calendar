@@ -41,6 +41,7 @@ const EventInfoModal = ({
         <DialogContent>
           <DialogContentText>
             <Typography
+              component={"span"}
               sx={{ fontSize: 14, marginTop: 3 }}
               color="text.secondary"
               gutterBottom
@@ -55,6 +56,7 @@ const EventInfoModal = ({
 
           <DialogContentText>
             <Typography
+              component={"span"}
               sx={{ fontSize: 14, marginTop: 3 }}
               color="text.secondary"
             >
@@ -68,6 +70,7 @@ const EventInfoModal = ({
 
           <DialogContentText>
             <Typography
+              component={"span"}
               sx={{ fontSize: 14, marginTop: 3 }}
               color="text.secondary"
             >
@@ -81,6 +84,7 @@ const EventInfoModal = ({
 
           <DialogContentText>
             <Typography
+              component={"span"}
               sx={{ fontSize: 14, marginTop: 3 }}
               color="text.secondary"
             >

@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
+import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
 import { useState, MouseEvent } from "react";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 
 import {
   Box,
@@ -15,6 +16,7 @@ import {
 } from "@mui/material";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 
 import AddEventModal from "./AddEvent";
 import EventInfoModal from "./EventModal";
@@ -33,6 +35,8 @@ const initialEventFormState = {
 export const generateId = () =>
   (Math.floor(Math.random() * 10000) + 1).toString();
 
+const DnDCalendar = withDragAndDrop(Calendar);
+
 const MyCalendar = () => {
   const [openSlot, setOpenSlot] = useState(false);
   const [currentEvent, setCurrentEvent] = useState(null);
@@ -44,16 +48,6 @@ const MyCalendar = () => {
   const [todos, setTodos] = useState([]);
 
   const [edit, setEdit] = useState(false);
-
-  //   state = {
-  //     events: [
-  //       {
-  //         start: moment().toDate(),
-  //         end: moment().add(1, "days").toDate(),
-  //         title: "Some title",
-  //       },
-  //     ],
-  //   };
 
   const handleSelectSlot = (event) => {
     setOpenSlot(true);
@@ -184,6 +178,7 @@ const MyCalendar = () => {
     );
     console.log(events);
     setEventInfoModal(false);
+    setEdit(false);
   };
 
   const allowEdit = () => {
@@ -198,6 +193,27 @@ const MyCalendar = () => {
       color: e.target.value,
     };
     setCurrentEvent(updatedCurrentEvent);
+  };
+
+  const onEventDrop = ({ event, start, end }) => {
+    const duration = event.end - event.start;
+    const updatedEvents = events.map((ev) => {
+      if (ev._id === event._id) {
+        return { ...ev, start, end: new Date(start.getTime() + duration) };
+      }
+      return ev;
+    });
+    setEvents(updatedEvents);
+  };
+
+  const onEventResize = ({ event, start, end }) => {
+    const updatedEvents = events.map((ev) => {
+      if (ev._id === event._id) {
+        return { ...ev, start, end };
+      }
+      return ev;
+    });
+    setEvents(updatedEvents);
   };
 
   return (
@@ -219,18 +235,20 @@ const MyCalendar = () => {
           handleClose={() => setEventInfoModal(false)}
           onDeleteEvent={onDeleteEvent}
           currentEvent={currentEvent}
-          //   onEditEvent={onEditEvent}
           onEditDescription={onEditDescription}
           onEditNote={onEditNote}
           allowEdit={allowEdit}
           onEditDay={onEditDay}
           onEditTime={onEditTime}
           allow={edit}
-          onCancelEvent={() => setEventInfoModal(false)}
+          onCancelEvent={() => {
+            setEventInfoModal(false);
+            setEdit(false);
+          }}
           onSaveEvent={onSaveEvent}
           setColor={setColor}
         />
-        <Calendar
+        <DnDCalendar
           localizer={localizer}
           defaultDate={new Date()}
           defaultView="month"
@@ -239,17 +257,19 @@ const MyCalendar = () => {
           onSelectEvent={handleSelectEvent}
           onSelectSlot={handleSelectSlot}
           selectable
+          resizable
           components={{ event: EventInfo }}
-          eventPropGetter={(event) => {
-            //   const hasTodo = todos.find((todo) => todo._id === event.todoId);
-            return {
-              style: {
-                backgroundColor: event.color ? event.color : "#66a0fe",
-                borderColor: event.color ? event.color : "#66a0fe",
-                height: 27,
-              },
-            };
-          }}
+          onEventDrop={onEventDrop}
+          onEventResize={onEventResize}
+          step={60}
+          timeslots={1}
+          eventPropGetter={(event) => ({
+            style: {
+              backgroundColor: event.color ? event.color : "#66a0fe",
+              borderColor: event.color ? event.color : "#66a0fe",
+              height: 27,
+            },
+          })}
         />
       </div>
     </>
